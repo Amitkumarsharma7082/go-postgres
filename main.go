@@ -9,17 +9,21 @@ import (
 	"gorm.io/gorm"
 )
 
+// ! 4.
 type Repository struct {
 	// Repo is DB
 	// gorm gives me to interact Database
 	DB *gorm.DB
 }
+
+// ! 5.
 type Book struct {
 	Author    string `json:"author"`
 	Title     string `json:"title"`
 	Publisher string `json:"publisher"`
 }
 
+// ! 7.
 // Create Books
 func (r *Repository) CreateBook(context *fiber.Ctx) error {
 	book := Book{}
@@ -48,6 +52,7 @@ func (r *Repository) CreateBook(context *fiber.Ctx) error {
 	return nil
 }
 
+// ! 8.
 // GetBooks
 func (r *Repository) GetBooks(context *fiber.Ctx) error {
 	bookModels := &[]models.book{}
@@ -67,6 +72,7 @@ func (r *Repository) GetBooks(context *fiber.Ctx) error {
 	return nil
 }
 
+// ! 6.
 // easily access the Repo inside func
 // struct method due to *Repo
 // the func accepts app *fiber
@@ -81,7 +87,7 @@ func (r *Repository) SetupRoutes(app *fiber.App) {
 }
 
 func main() {
-
+	//! 1.
 	// import .env file
 	// capture the err
 	err := godotenv.Load(".env")
@@ -97,10 +103,10 @@ func main() {
 	r := Repository{
 		DB: db,
 	}
-
+	//! 2.
 	// use fiber package to create new routes
 	app := fiber.New()
-
+	//! 3.
 	// create a func routes and app sent to it
 	// here r : is Repository strcut
 	r.SetupRoutes(app)

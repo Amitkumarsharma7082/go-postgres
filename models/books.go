@@ -11,6 +11,9 @@ type Books struct {
 }
 
 func MigrateBooks(db *gorm.DB) error {
+	/*
+		AutoMigrate is a Gorm method that automatically creates or updates the database table schema to match the structure of your Go struct (Books in this case).
+	*/
 	err := db.AutoMigrate(&Books{})
 	return err
 }

@@ -2,6 +2,7 @@ package main
 
 import (
 	"log"
+	"net/http"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/joho/godotenv"
@@ -19,6 +20,33 @@ type Book struct {
 	Publisher string `json:"publisher"`
 }
 
+func (r *Repository) CreateBook(context *fiber.Ctx) error {
+	book := Book{}
+
+	/*
+		if you are using http : fiber is level of abstraction the background is
+		request and response.
+	*/
+	// BodyParser : is Json you getting into book format
+	err := context.BodyParser(&book)
+	if err != nil {
+		context.Status(http.StatusUnprocessableEntity).JSON(
+			&fiber.Map{"message": "Request failed"})
+		return err
+	}
+	// added to database
+	err = r.DB.Create(&book).Error
+	if err != nil {
+		context.Status(http.StatusBadRequest).JSON(
+			&fiber.Map{"message": "could not create book"})
+		return err
+	}
+	context.Status(http.StatusOK).JSON(
+		&fiber.Map{"message": "book has been added"})
+
+	return nil
+}
+
 // easily access the Repo inside func
 // struct method due to *Repo
 // the func accepts app *fiber
@@ -33,12 +61,14 @@ func (r *Repository) SetupRoutes(app *fiber.App) {
 }
 
 func main() {
+
 	// import .env file
 	// capture the err
 	err := godotenv.Load(".env")
 	if err != nil {
 		log.Fatal(err)
 	}
+
 	// config from .env
 	db, err := storage.NewConnection(config)
 	if err != nil {
@@ -50,9 +80,11 @@ func main() {
 
 	// use fiber package to create new routes
 	app := fiber.New()
+
 	// create a func routes and app sent to it
 	// here r : is Repository strcut
 	r.SetupRoutes(app)
+
 	// app listen on Port 8080
 	app.Listen(":8080")
 }
